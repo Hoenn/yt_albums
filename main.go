@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+  "os/exec"
 	"path/filepath"
 )
 
@@ -15,7 +16,19 @@ func main() {
 	//If no loop
 
   path := makeDir(artistName, albumName)
-  fmt.Println(filepath.Abs(path))
+  os.Chdir(path)
+
+  //youtube-dl -o path
+  //youtube-dl --extract-audio --audio-format mp3 -i <SongName/PlaylistLink>
+
+  fmt.Print("Playlist URL: ")
+  scanner.Scan()
+  url := scanner.Text()
+
+  cmd := exec.Command("youtube-dl", url)
+  s,e := cmd.Output()
+  fmt.Println(s, e)
+
 }
 
 func makeDir(parent, child string) string {
