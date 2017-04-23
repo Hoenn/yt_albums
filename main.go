@@ -27,9 +27,9 @@ func main() {
   pipe, _ := cmd.StdoutPipe()
 
   cmd.Start()
-  s := bufio.NewScanner(pipe)
-  for s.Scan(){
-    fmt.Println(string(s.Text()))
+  ytdl := bufio.NewScanner(pipe)
+  for ytdl.Scan(){
+    fmt.Println(string(ytdl.Text()))
   }
 
 }
