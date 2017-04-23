@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-  "os/exec"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -15,22 +15,21 @@ func main() {
 	fmt.Printf("\nArtist: %v Album: %v\n", artistName, albumName)
 	//If no loop
 
+	fmt.Print("Playlist URL: ")
+	scanner.Scan()
+	url := scanner.Text()
 
-  fmt.Print("Playlist URL: ")
-  scanner.Scan()
-  url := scanner.Text()
+	path := makeDir(artistName, albumName)
+	os.Chdir(path)
 
-  path := makeDir(artistName, albumName)
-  os.Chdir(path)
+	cmd := exec.Command("youtube-dl", "--extract-audio", "--audio-format", "mp3", "-i", url)
+	pipe, _ := cmd.StdoutPipe()
 
-  cmd := exec.Command("youtube-dl", "--extract-audio", "--audio-format", "mp3", "-i", url)
-  pipe, _ := cmd.StdoutPipe()
-
-  cmd.Start()
-  ytdl := bufio.NewScanner(pipe)
-  for ytdl.Scan(){
-    fmt.Println(string(ytdl.Text()))
-  }
+	cmd.Start()
+	ytdl := bufio.NewScanner(pipe)
+	for ytdl.Scan() {
+		fmt.Println(string(ytdl.Text()))
+	}
 
 }
 
@@ -39,7 +38,7 @@ func makeDir(parent, child string) string {
 	os.MkdirAll(parentPath, os.ModePerm)
 	childPath := filepath.Join(".", parentPath, child)
 	os.MkdirAll(childPath, os.ModePerm)
-  return childPath
+	return childPath
 }
 
 func getNames(scanner *bufio.Scanner) (string, string) {
