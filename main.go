@@ -6,14 +6,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+  "strings"
 )
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+
 	artistName, albumName := getNames(scanner)
-	//is this Correct prompt?
-	fmt.Printf("\nArtist: %v Album: %v\n", artistName, albumName)
-	//If no loop
+  confirmInput(scanner, artistName, albumName)
 
 	fmt.Print("Playlist URL: ")
 	scanner.Scan()
@@ -30,6 +30,24 @@ func main() {
 	for ytdl.Scan() {
 		fmt.Println(string(ytdl.Text()))
 	}
+
+}
+
+func confirmInput(scanner *bufio.Scanner, artistName, albumName string) {
+
+	fmt.Printf("\nArtist: %v Album: %v\n", artistName, albumName)
+  fmt.Println("Is this information correct? Y to procced, N for re-entry")
+  scanner.Scan()
+  response := strings.TrimSpace(scanner.Text())
+  if response == "Y"{
+    return;
+
+  } else if response == "N"{
+    main();
+  } else {
+    fmt.Println("Unknown response")
+    confirmInput(scanner, artistName, albumName)
+  }
 
 }
 
