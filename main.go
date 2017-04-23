@@ -20,9 +20,16 @@ func main() {
 	url := scanner.Text()
 
 	path := makeDir(artistName, albumName)
-	os.Chdir(path)
+  path = path + "%(title)s.%(ext)s"
 
-	cmd := exec.Command("youtube-dl", "--extract-audio", "--audio-format", "mp3", "-i", url)
+  args := []string{
+   "--extract-audio",
+   "--audio-format", "mp3",
+   "-i",
+   "-o", path,
+   url }
+
+	cmd := exec.Command("youtube-dl", args...)
 	pipe, _ := cmd.StdoutPipe()
 
 	cmd.Start()
@@ -30,7 +37,7 @@ func main() {
 	for ytdl.Scan() {
 		fmt.Println(string(ytdl.Text()))
 	}
-
+  main()
 }
 
 func confirmInput(scanner *bufio.Scanner, artistName, albumName string) {
