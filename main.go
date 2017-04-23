@@ -37,6 +37,9 @@ func main() {
 	for ytdl.Scan() {
 		fmt.Println(string(ytdl.Text()))
 	}
+
+  fmt.Println("Press Enter for new album, Control-C to quit")
+  scanner.Scan()
   main()
 }
 
