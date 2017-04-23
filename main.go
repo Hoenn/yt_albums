@@ -15,19 +15,22 @@ func main() {
 	fmt.Printf("\nArtist: %v Album: %v\n", artistName, albumName)
 	//If no loop
 
-  path := makeDir(artistName, albumName)
-  os.Chdir(path)
-
-  //youtube-dl -o path
-  //youtube-dl --extract-audio --audio-format mp3 -i <SongName/PlaylistLink>
 
   fmt.Print("Playlist URL: ")
   scanner.Scan()
   url := scanner.Text()
 
-  cmd := exec.Command("youtube-dl", url)
-  s,e := cmd.Output()
-  fmt.Println(s, e)
+  path := makeDir(artistName, albumName)
+  os.Chdir(path)
+
+  cmd := exec.Command("youtube-dl", "--extract-audio", "--audio-format", "mp3", "-i", url)
+  pipe, _ := cmd.StdoutPipe()
+
+  cmd.Start()
+  s := bufio.NewScanner(pipe)
+  for s.Scan(){
+    fmt.Println(string(s.Text()))
+  }
 
 }
 
