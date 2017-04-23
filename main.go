@@ -6,58 +6,58 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-  "strings"
+	"strings"
 )
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	artistName, albumName := getNames(scanner)
-  confirmInput(scanner, artistName, albumName)
+	confirmInput(scanner, artistName, albumName)
 
 	fmt.Print("Playlist URL: ")
 	scanner.Scan()
 	url := scanner.Text()
 
 	path := makeDir(artistName, albumName)
-  path = path + "%(title)s.%(ext)s"
+	//Needed for -o argument given to youtube-dl
+	path = path + "%(title)s.%(ext)s"
 
-  args := []string{
-   "--extract-audio",
-   "--audio-format", "mp3",
-   "-i",
-   "-o", path,
-   url }
+	args := []string{
+		"--extract-audio",
+		"--audio-format", "mp3",
+		"-i",
+		"-o", path,
+		url}
 
 	cmd := exec.Command("youtube-dl", args...)
 	pipe, _ := cmd.StdoutPipe()
-
 	cmd.Start()
 	ytdl := bufio.NewScanner(pipe)
 	for ytdl.Scan() {
 		fmt.Println(string(ytdl.Text()))
 	}
 
-  fmt.Println("Press Enter for new album, Control-C to quit")
-  scanner.Scan()
-  main()
+	fmt.Println("Press Enter for new album, Control-C to quit")
+	scanner.Scan()
+	main()
 }
 
 func confirmInput(scanner *bufio.Scanner, artistName, albumName string) {
 
 	fmt.Printf("\nArtist: %v Album: %v\n", artistName, albumName)
-  fmt.Println("Is this information correct? Y to procced, N for re-entry")
-  scanner.Scan()
-  response := strings.TrimSpace(scanner.Text())
-  if response == "Y"{
-    return;
+	fmt.Println("Is this information correct? Y to procced, N for re-entry")
+	scanner.Scan()
+	response := strings.TrimSpace(scanner.Text())
+	if response == "Y" {
+		return
 
-  } else if response == "N"{
-    main();
-  } else {
-    fmt.Println("Unknown response")
-    confirmInput(scanner, artistName, albumName)
-  }
+	} else if response == "N" {
+		main()
+	} else {
+		fmt.Println("Unknown response")
+		confirmInput(scanner, artistName, albumName)
+	}
 
 }
 
