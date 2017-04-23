@@ -12,13 +12,18 @@ func main() {
 	artistName, albumName := getNames(scanner)
 	//is this Correct prompt?
 	fmt.Printf("\nArtist: %v Album: %v\n", artistName, albumName)
-
 	//If no loop
 
-	artistPath := filepath.Join(".", artistName)
-	os.MkdirAll(artistPath, os.ModePerm)
-	albumPath := filepath.Join(".", artistName, albumName)
-	os.MkdirAll(albumPath, os.ModePerm)
+  path := makeDir(artistName, albumName)
+  fmt.Println(filepath.Abs(path))
+}
+
+func makeDir(parent, child string) string {
+	parentPath := filepath.Join(".", parent)
+	os.MkdirAll(parentPath, os.ModePerm)
+	childPath := filepath.Join(".", parentPath, child)
+	os.MkdirAll(childPath, os.ModePerm)
+  return childPath
 }
 
 func getNames(scanner *bufio.Scanner) (string, string) {
