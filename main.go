@@ -4,31 +4,31 @@ import (
 	"bufio"
 	"fmt"
 
+	"io/ioutil"
 	"os"
 	"os/exec"
-  "path/filepath"
-  "io/ioutil"
+	"path/filepath"
 
 	"strings"
 
-  id3 "github.com/mikkyang/id3-go"
+	id3 "github.com/mikkyang/id3-go"
 )
 
 type UserInput struct {
-  artist, album string
+	artist, album string
 }
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	artistName, albumName := getNames(scanner)
-  user := UserInput{artistName, albumName}
+	user := UserInput{artistName, albumName}
 	confirmInput(scanner, user)
 
-  url := getUrlInput(scanner)
+	url := getUrlInput(scanner)
 
 	path := makeDirs(user.artist, user.album)
-	ytdlpath:= path + "/%(title)s.%(ext)s"
+	ytdlpath := path + "/%(title)s.%(ext)s"
 
 	args := []string{
 		"--extract-audio",
@@ -45,23 +45,22 @@ func main() {
 		fmt.Println(string(ytdl.Text()))
 	}
 
-  fmt.Println("*********Download Complete*********")
+	fmt.Println("*********Download Complete*********")
 
-  //Update ID3 tags//
-  mainDir,_ := os.Getwd()
-  os.Chdir(path)
+	//Update ID3 tags//
+	mainDir, _ := os.Getwd()
+	os.Chdir(path)
 
-  files, _ := ioutil.ReadDir("./")
-  for _, f := range files {
-    mp3File, _ := id3.Open("./"+f.Name())
-    mp3File.SetArtist(user.artist)
-    mp3File.SetAlbum(user.album)
-    fmt.Println("ID3 tags set")
-    fmt.Println(mp3File.Artist())
-    mp3File.Close()
-  }
+	files, _ := ioutil.ReadDir("./")
+	for _, f := range files {
+		mp3File, _ := id3.Open("./" + f.Name())
+		mp3File.SetArtist(user.artist)
+		mp3File.SetAlbum(user.album)
+		mp3File.Close()
+	}
 
-  os.Chdir(mainDir)
+	fmt.Println("*********ID3 Tags Set*********")
+	os.Chdir(mainDir)
 
 	fmt.Println("Press Enter for new album, Control-C to quit")
 	scanner.Scan()
@@ -75,10 +74,10 @@ func confirmInput(scanner *bufio.Scanner, u UserInput) {
 	scanner.Scan()
 	response := strings.TrimSpace(strings.ToLower(scanner.Text()))
 	if response == "y" {
-    fmt.Println()
+		fmt.Println()
 		return
 	} else if response == "n" {
-    fmt.Println()
+		fmt.Println()
 		main()
 	} else {
 		fmt.Println("Unknown response")
