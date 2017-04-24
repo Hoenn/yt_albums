@@ -21,7 +21,7 @@ func main() {
 
 	path := makeDir(artistName, albumName)
 	//Needed for -o argument given to youtube-dl
-	path = path + "%(title)s.%(ext)s"
+	path = path + "/%(title)s.%(ext)s"
 
 	args := []string{
 		"--extract-audio",
