@@ -3,10 +3,15 @@ package main
 import (
 	"bufio"
 	"fmt"
+
 	"os"
 	"os/exec"
-	"path/filepath"
+  "path/filepath"
+  "io/ioutil"
+
 	"strings"
+
+  id3 "github.com/mikkyang/id3-go"
 )
 
 type UserInput struct {
@@ -22,14 +27,14 @@ func main() {
 
   url := getUrlInput(scanner)
 
-	path := makeDir(user.artist, user.album)
-	path = path + "/%(title)s.%(ext)s"
+	path := makeDirs(user.artist, user.album)
+	ytdlpath:= path + "/%(title)s.%(ext)s"
 
 	args := []string{
 		"--extract-audio",
 		"--audio-format", "mp3",
 		"-i",
-		"-o", path,
+		"-o", ytdlpath,
 		url}
 
 	cmd := exec.Command("youtube-dl", args...)
@@ -39,7 +44,25 @@ func main() {
 	for ytdl.Scan() {
 		fmt.Println(string(ytdl.Text()))
 	}
+
   fmt.Println("*********Download Complete*********")
+
+  //Update ID3 tags//
+  mainDir,_ := os.Getwd()
+  os.Chdir(path)
+
+  files, _ := ioutil.ReadDir("./")
+  for _, f := range files {
+    mp3File, _ := id3.Open("./"+f.Name())
+    mp3File.SetArtist(user.artist)
+    mp3File.SetAlbum(user.album)
+    fmt.Println("ID3 tags set")
+    fmt.Println(mp3File.Artist())
+    mp3File.Close()
+  }
+
+  os.Chdir(mainDir)
+
 	fmt.Println("Press Enter for new album, Control-C to quit")
 	scanner.Scan()
 	main()
@@ -64,7 +87,7 @@ func confirmInput(scanner *bufio.Scanner, u UserInput) {
 
 }
 
-func makeDir(parent, child string) string {
+func makeDirs(parent, child string) string {
 	parentPath := filepath.Join(".", parent)
 	os.MkdirAll(parentPath, os.ModePerm)
 	childPath := filepath.Join(".", parentPath, child)
