@@ -9,18 +9,20 @@ import (
 	"strings"
 )
 
+type UserInput struct {
+  artist, album string
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	artistName, albumName := getNames(scanner)
-	confirmInput(scanner, artistName, albumName)
+  user := UserInput{artistName, albumName}
+	confirmInput(scanner, user)
 
-	fmt.Print("Playlist URL: ")
-	scanner.Scan()
-	url := scanner.Text()
+  url := getUrlInput(scanner)
 
-	path := makeDir(artistName, albumName)
-	//Needed for -o argument given to youtube-dl
+	path := makeDir(user.artist, user.album)
 	path = path + "/%(title)s.%(ext)s"
 
 	args := []string{
@@ -37,26 +39,27 @@ func main() {
 	for ytdl.Scan() {
 		fmt.Println(string(ytdl.Text()))
 	}
-
+  fmt.Println("*********Download Complete*********")
 	fmt.Println("Press Enter for new album, Control-C to quit")
 	scanner.Scan()
 	main()
 }
 
-func confirmInput(scanner *bufio.Scanner, artistName, albumName string) {
+func confirmInput(scanner *bufio.Scanner, u UserInput) {
 
-	fmt.Printf("\nArtist: %v Album: %v\n", artistName, albumName)
-	fmt.Println("Is this information correct? Y to procced, N for re-entry")
+	fmt.Printf("\nArtist: %v Album: %v\n", u.artist, u.album)
+	fmt.Print("Is this information correct? Y to procced, N for re-entry: ")
 	scanner.Scan()
-	response := strings.TrimSpace(scanner.Text())
-	if response == "Y" {
+	response := strings.TrimSpace(strings.ToLower(scanner.Text()))
+	if response == "y" {
+    fmt.Println()
 		return
-
-	} else if response == "N" {
+	} else if response == "n" {
+    fmt.Println()
 		main()
 	} else {
 		fmt.Println("Unknown response")
-		confirmInput(scanner, artistName, albumName)
+		confirmInput(scanner, u)
 	}
 
 }
@@ -81,4 +84,10 @@ func getNames(scanner *bufio.Scanner) (string, string) {
 
 	return artistName, albumName
 
+}
+
+func getUrlInput(scanner *bufio.Scanner) string {
+	fmt.Print("Playlist URL: ")
+	scanner.Scan()
+	return scanner.Text()
 }
