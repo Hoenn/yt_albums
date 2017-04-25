@@ -1,4 +1,4 @@
-# yt_hoard
+# yt_albums
 Command line prompt written in [Go](https://golang.org/) for the task of using [youtube-dl](https://rg3.github.io/youtube-dl/) to download playlists from Youtube as if they were albums.
 
 Depends on [youtube-dl](https://rg3.github.io/youtube-dl/) being available in your path.
