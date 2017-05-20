@@ -26,8 +26,7 @@ func main() {
 	var userInputs = []UserInput{}
 	moreInput := true
 	for moreInput {
-		artistName, albumName, url := getInput(scanner)
-		user := UserInput{artistName, albumName, url}
+		user := getInput(scanner)
 		userInputs = append(userInputs, user)
 		moreInput = confirmInput("Add another artist/album (Y/N): ", scanner)
 	}
@@ -73,7 +72,7 @@ func updateID3Tags(wg *sync.WaitGroup, path string, user UserInput) {
 		mp3File.SetAlbum(user.album)
 		mp3File.Close()
 	}
-	fmt.Println("**ID3 Tags Set** for " + user.artist + " " + user.album)
+	fmt.Println("**ID3 Tags Set** for " + user.artist + ": " + user.album)
 }
 
 func confirmInput(msg string, scanner *bufio.Scanner) bool {
@@ -96,7 +95,7 @@ func makeDirs(parent, child string) string {
 	return childPath
 }
 
-func getInput(scanner *bufio.Scanner) (string, string, string) {
+func getInput(scanner *bufio.Scanner) UserInput {
 
 	fmt.Print("Enter artist name: ")
 	scanner.Scan()
@@ -110,6 +109,6 @@ func getInput(scanner *bufio.Scanner) (string, string, string) {
 	scanner.Scan()
 	url := scanner.Text()
 
-	return artistName, albumName, url
+	return UserInput{artistName, albumName, url}
 
 }
