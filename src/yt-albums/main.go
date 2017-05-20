@@ -31,7 +31,6 @@ func main() {
 	}
 
 	//Save main directory to return to
-	mainDir, _ := os.Getwd()
 	for _, user := range userInputs {
 
 		path := makeDirs(user.artist, user.album)
@@ -55,9 +54,7 @@ func main() {
 		fmt.Println("*********Download Complete*********")
 
 		updateID3Tags(path, user) //send additional args struct
-		os.Chdir(mainDir)
 	}
-	//stop here
 
 	fmt.Println("Press enter to run again, Control-C to quit")
 	scanner.Scan()
@@ -65,10 +62,9 @@ func main() {
 }
 
 func updateID3Tags(path string, user UserInput) {
-	os.Chdir(path)
-	files, _ := ioutil.ReadDir("./")
+	files, _ := ioutil.ReadDir(path)
 	for _, f := range files {
-		mp3File, _ := id3.Open("./" + f.Name())
+		mp3File, _ := id3.Open(path + "/" + f.Name())
 		mp3File.SetArtist(user.artist)
 		mp3File.SetAlbum(user.album)
 		mp3File.Close()
