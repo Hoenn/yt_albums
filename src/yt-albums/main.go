@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 
+	"sync"
+
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -30,7 +32,8 @@ func main() {
 		moreInput = confirmInput("Add another artist/album (Y/N): ", scanner)
 	}
 
-	//Save main directory to return to
+	var wg sync.WaitGroup
+	wg.Add(len(userInputs))
 	for _, user := range userInputs {
 
 		path := makeDirs(user.artist, user.album)
@@ -51,17 +54,18 @@ func main() {
 			fmt.Println(string(ytdl.Text()))
 		}
 
-		fmt.Println("*********Download Complete*********")
-
-		updateID3Tags(path, user) //send additional args struct
+		fmt.Println("**Download Complete**: Spawning subroutine to set ID3 Tags")
+		go updateID3Tags(&wg, path, user) //send additional args struct
 	}
-
+	fmt.Println("Waiting for subroutines to complete")
+	wg.Wait()
 	fmt.Println("Press enter to run again, Control-C to quit")
 	scanner.Scan()
 	main()
 }
 
-func updateID3Tags(path string, user UserInput) {
+func updateID3Tags(wg *sync.WaitGroup, path string, user UserInput) {
+	defer wg.Done()
 	files, _ := ioutil.ReadDir(path)
 	for _, f := range files {
 		mp3File, _ := id3.Open(path + "/" + f.Name())
@@ -69,7 +73,7 @@ func updateID3Tags(path string, user UserInput) {
 		mp3File.SetAlbum(user.album)
 		mp3File.Close()
 	}
-	fmt.Println("*********ID3 Tags Set*********")
+	fmt.Println("**ID3 Tags Set** for " + user.artist + " " + user.album)
 }
 
 func confirmInput(msg string, scanner *bufio.Scanner) bool {
