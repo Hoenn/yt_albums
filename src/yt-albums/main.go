@@ -27,11 +27,11 @@ func main() {
 		artistName, albumName, url := getInput(scanner)
 		user := UserInput{artistName, albumName, url}
 		userInputs = append(userInputs, user)
-		moreInput = confirmInput("Add another artist/album: Y/N", scanner)
+		moreInput = confirmInput("Add another artist/album (Y/N): ", scanner)
 	}
 
+	//Save main directory to return to
 	mainDir, _ := os.Getwd()
-	//For each all of this.
 	for _, user := range userInputs {
 
 		path := makeDirs(user.artist, user.album)
@@ -77,7 +77,7 @@ func updateID3Tags(path string, user UserInput) {
 }
 
 func confirmInput(msg string, scanner *bufio.Scanner) bool {
-	fmt.Println(msg)
+	fmt.Print(msg)
 	scanner.Scan()
 	response := strings.TrimSpace(strings.ToLower(scanner.Text()))
 	if response == "y" {
